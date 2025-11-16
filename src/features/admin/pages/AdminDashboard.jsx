@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-// Mock Data for Dashboard Cards (In a real app, this would be fetched from /api/admin/stats)
 const mockStats = [
     {
         title: "Total Users",

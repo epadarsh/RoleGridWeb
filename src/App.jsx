@@ -1,34 +1,23 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute.jsx";
+
 import Navbar from "./components/Navbar";
-import AuthInitializer from "./components/AuthInitializer.jsx"; // Session persistence fix
-import ToastManager from "./components/ToastManager.jsx"; // Global error display
-
-// Auth Pages (Ensure these files are named .jsx)
+import PublicRoute from "./components/PublicRoute.jsx";
+import ProtectedRoute from "./components/ProtectedRoute";
+import ProductsPage from "./components/ProductsPage.jsx";
+import ToastManager from "./components/ToastManager.jsx";
 import LoginPage from "./features/auth/pages/LoginPage.jsx";
+import AuthInitializer from "./components/AuthInitializer.jsx";
 import RegisterPage from "./features/auth/pages/RegisterPage.jsx";
-
-// User Pages (Ensure these files are named .jsx)
 import UserDashboard from "./features/user/pages/UserDashboard.jsx";
-import InternalProductsPage from "./features/user/pages/InternalProductsPage.jsx";
-// Admin Pages (Ensure these files are named .jsx)
 import AdminDashboard from "./features/admin/pages/AdminDashboard.jsx";
 import UserManagementPage from "./features/admin/pages/UserManagementPage.jsx";
 import ProductManagementPage from "./features/admin/pages/ProductManagementPage.jsx";
 
-// Public Pages (Ensure these files are named .jsx)
-import PublicProductsPage from "./features/public/pages/PublicProductsPage.jsx";
-import ProductsPage from "./components/ProductsPage.jsx";
-
 function App() {
     return (
         <BrowserRouter>
-            {/* ToastManager is placed here so it's always rendered and listens to errors */}
             <ToastManager />
-
-            {/* AuthInitializer wraps the entire application to restore the session on refresh */}
             <AuthInitializer>
                 <Navbar />
                 <main className="p-4 bg-gray-50 min-h-screen">

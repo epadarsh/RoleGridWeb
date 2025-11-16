@@ -6,7 +6,6 @@ const Modal = ({ open, handleClose, title, children, actions }) => {
     return (
         <div className="fixed inset-0 z-[100] bg-gray-900 bg-opacity-75 flex justify-center items-center p-4 transition-opacity duration-300">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all sm:my-8 sm:align-middle">
-                {/* Header */}
                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h2 className="text-xl font-semibold text-gray-800">
                         {title}
@@ -21,7 +20,6 @@ const Modal = ({ open, handleClose, title, children, actions }) => {
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
                         >
                             <path
                                 strokeLinecap="round"
@@ -33,12 +31,10 @@ const Modal = ({ open, handleClose, title, children, actions }) => {
                     </button>
                 </div>
 
-                {/* Content */}
                 <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
                     {children}
                 </div>
 
-                {/* Actions */}
                 <div className="flex justify-end px-6 py-4 border-t border-gray-100 bg-gray-50 space-x-3">
                     {actions}
                 </div>
