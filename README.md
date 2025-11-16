@@ -14,19 +14,25 @@ npm or Yarn
 
 Installation
 
+# Clone the repository and navigate into the project directory as follows.
+
+    git clone https://github.com/epadarsh/RoleGridWeb.git
+
+    cd RoleGridWeb
+
 Navigate to the frontend directory.
 
 Install all dependencies:
 
-npm install
+    npm install
 
 # OR
 
-yarn install
+    yarn install
 
 ## Start the development server:
 
-npm run dev
+    npm run dev
 
 ## The application will typically launch at http://localhost:5173.
 
