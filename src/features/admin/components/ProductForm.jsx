@@ -1,56 +1,8 @@
 import React, { useState, useEffect } from "react";
+
 import api from "../../../services/api";
 import Modal from "../../../components/Modal";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-
-// --- Reusable Tailwind Modal Component ---
-// const Modal = ({ open, handleClose, title, children, actions }) => {
-//     if (!open) return null;
-
-//     return (
-//         <div className="fixed inset-0 z-[100] bg-gray-900 bg-opacity-75 flex justify-center items-center p-4 transition-opacity duration-300">
-//             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all sm:my-8 sm:align-middle">
-//                 {/* Header */}
-//                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
-//                     <h2 className="text-xl font-semibold text-gray-800">
-//                         {title}
-//                     </h2>
-//                     <button
-//                         onClick={handleClose}
-//                         className="text-gray-400 hover:text-gray-600 transition duration-150 p-1"
-//                         aria-label="Close"
-//                     >
-//                         <svg
-//                             className="w-6 h-6"
-//                             fill="none"
-//                             stroke="currentColor"
-//                             viewBox="0 0 24 24"
-//                             xmlns="http://www.w3.org/2000/svg"
-//                         >
-//                             <path
-//                                 strokeLinecap="round"
-//                                 strokeLinejoin="round"
-//                                 strokeWidth="2"
-//                                 d="M6 18L18 6M6 6l12 12"
-//                             ></path>
-//                         </svg>
-//                     </button>
-//                 </div>
-
-//                 {/* Content */}
-//                 <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
-//                     {children}
-//                 </div>
-
-//                 {/* Actions */}
-//                 <div className="flex justify-end px-6 py-4 border-t border-gray-100 bg-gray-50 space-x-3">
-//                     {actions}
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-// ------------------------------------------
 
 const initialProductState = {
     title: "",
@@ -67,17 +19,15 @@ const ProductForm = ({ open, handleClose, currentProduct, onSaveSuccess }) => {
 
     const isEditMode = !!currentProduct;
 
-    // Syncs the form state when the currentProduct prop changes (for editing)
     useEffect(() => {
         if (currentProduct) {
             setFormData(currentProduct);
         } else {
             setFormData(initialProductState);
         }
-        setError(null); // Clear errors on opening/switching mode
+        setError(null);
     }, [currentProduct, open]);
 
-    // Handler for all form field changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -87,7 +37,6 @@ const ProductForm = ({ open, handleClose, currentProduct, onSaveSuccess }) => {
         }));
     };
 
-    // Handler for form submission (Create or Update API call)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -100,7 +49,7 @@ const ProductForm = ({ open, handleClose, currentProduct, onSaveSuccess }) => {
 
         try {
             await api[method](endpoint, formData);
-            onSaveSuccess(); // Trigger list refresh in parent
+            onSaveSuccess();
             handleClose();
         } catch (err) {
             const serverMessage =

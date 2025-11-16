@@ -1,5 +1,6 @@
 import React from "react";
 import DataTable from "react-data-table-component";
+
 import api from "../../../services/api";
 
 const ProductTable = ({
@@ -23,7 +24,7 @@ const ProductTable = ({
 
         try {
             await api.delete(`/admin/products/${id}`);
-            onDataChange(); // Notify parent to refresh list
+            onDataChange();
         } catch (error) {
             console.error(
                 "Failed to delete product:",
@@ -99,7 +100,6 @@ const ProductTable = ({
         },
     ];
 
-    // Custom Spinner for RDTC loading state (Tailwind only)
     const CustomLoader = (
         <div className="p-4">
             <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-indigo-500 mx-auto"></div>

@@ -87,7 +87,6 @@ const ProductsPage = (props) => {
                                         alt={product.title}
                                         className="max-h-full max-w-full object-contain rounded-md"
                                         onError={(e) => {
-                                            // Fallback image handling
                                             e.target.onerror = null;
                                             e.target.src =
                                                 "https://placehold.co/200x200/cccccc/333333?text=Image+Unavailable";

@@ -3,9 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import api from "../../../services/api";
 import { setUser } from "../../auth/authSlice";
 import LoadingSpinner from "../../../components/LoadingSpinner";
-
-// NOTE: Replace this with your actual front-end base URL
-const FRONTEND_BASE_URL = "http://localhost:5173";
+import { FRONTEND_BASE_URL } from "../../../utils/constants";
 
 const UserDashboard = () => {
     const dispatch = useDispatch();
@@ -15,7 +13,6 @@ const UserDashboard = () => {
     const [error, setError] = useState(null);
     const [copyStatus, setCopyStatus] = useState(false);
 
-    // --- Tailwind Utility Components/Styles ---
     const CardStyle =
         "bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300";
     const AlertErrorStyle =
@@ -23,16 +20,12 @@ const UserDashboard = () => {
     const ButtonStyle =
         "bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition duration-150 shadow-md disabled:opacity-50";
 
-    // --- Data Fetching ---
-
     const fetchUserData = useCallback(async () => {
         setLoading(true);
         try {
-            // Fetches user data, including the latest referral_count
             const response = await api.get("/user");
-            console.log("aa_response", response);
 
-            dispatch(setUser(response.data)); // Update global user state
+            dispatch(setUser(response.data));
         } catch (err) {
             console.log("User Data Fetch Error:--->>", err);
             setError(
@@ -44,16 +37,12 @@ const UserDashboard = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        // If we have a token but no user object, fetch the details.
         if (!currentUser) {
             fetchUserData();
         } else {
-            // If user data is already in Redux, stop loading immediately
             setLoading(false);
         }
     }, [currentUser, fetchUserData]);
-
-    // --- Referral Logic ---
 
     const referralCode = currentUser?.referral_code;
     const referralLink = referralCode
@@ -62,7 +51,6 @@ const UserDashboard = () => {
 
     const handleCopyLink = () => {
         if (referralLink) {
-            // Use document.execCommand('copy') for better compatibility in iframe environments
             const el = document.createElement("textarea");
             el.value = referralLink;
             el.setAttribute("readonly", "");
@@ -74,11 +62,9 @@ const UserDashboard = () => {
             document.body.removeChild(el);
 
             setCopyStatus(true);
-            setTimeout(() => setCopyStatus(false), 2000); // Reset copy status after 2s
+            setTimeout(() => setCopyStatus(false), 2000);
         }
     };
-
-    // --- Render Logic ---
 
     if (loading) return <LoadingSpinner />;
     if (error) return <div className={AlertErrorStyle}>{error}</div>;

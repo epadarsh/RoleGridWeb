@@ -15,30 +15,25 @@ const RegisterPage = () => {
         email: "",
         password: "",
         password_confirmation: "",
-        referral_code: "", // Initialized here
+        referral_code: "",
     });
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // --- Handlers & Effects ---
-
-    // 1. Effect to capture the referral code from the URL
     useEffect(() => {
-        // Reads from URL: /register?ref=CODE
         const refCode = searchParams.get("ref");
         if (refCode) {
             setFormData((prev) => ({ ...prev, referral_code: refCode }));
         }
     }, [searchParams]);
 
-    // 2. Generic input change handler
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    // 3. Form submission logic
+    // Form submission logic
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);

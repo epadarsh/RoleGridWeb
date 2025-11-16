@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
+
 import api from "../../../services/api";
 import { setCredentials } from "../authSlice";
 import LoadingSpinner from "../../../components/LoadingSpinner";
@@ -17,7 +18,6 @@ const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // --- Handlers ---
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -39,7 +39,6 @@ const LoginPage = () => {
                 })
             );
 
-            // Redirect based on role (though ProtectedRoute will handle role check)
             if (response.data.role === "admin") {
                 navigate("/admin");
             } else {
@@ -55,7 +54,6 @@ const LoginPage = () => {
         }
     };
 
-    // --- Tailwind Utility Styles ---
     const InputStyle =
         "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 shadow-sm";
     const ButtonPrimaryStyle =
@@ -63,14 +61,12 @@ const LoginPage = () => {
     const AlertErrorStyle =
         "p-4 mb-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg";
 
-    // Placeholder image URL - replaced with a relevant placeholder
     const imageUrl =
         "https://placehold.co/800x600/6366F1/FFFFFF?text=Referral+System+Dashboard";
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="flex w-full max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-                {/* Left Side: Image / Visual (Hidden on small screens) */}
                 <div className="hidden lg:block lg:w-1/2 p-6">
                     <div className="h-full bg-indigo-500 rounded-lg flex items-center justify-center">
                         <img
@@ -78,7 +74,6 @@ const LoginPage = () => {
                             alt="Referral System Dashboard"
                             className="w-full h-full object-cover rounded-lg transform transition duration-500 hover:scale-[1.02]"
                             onError={(e) => {
-                                // Fallback if placeholder URL fails
                                 e.target.onerror = null;
                                 e.target.src =
                                     "https://placehold.co/800x600/4F46E5/FFFFFF?text=Referral+App+Visual";
@@ -87,7 +82,6 @@ const LoginPage = () => {
                     </div>
                 </div>
 
-                {/* Right Side: Login Form */}
                 <div className="w-full lg:w-1/2 p-12 flex items-center justify-start lg:justify-end">
                     <div className="w-full max-w-sm space-y-8">
                         <h1 className="text-4xl font-extrabold text-gray-900">

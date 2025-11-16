@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import ProductTable from "../components/ProductTable";
-import ProductForm from "../components/ProductForm";
+
 import api from "../../../services/api";
+import ProductForm from "../components/ProductForm";
+import ProductTable from "../components/ProductTable";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const ProductManagementPage = () => {
@@ -11,15 +12,13 @@ const ProductManagementPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
 
-    // Server-side state required by RDTC
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [totalRows, setTotalRows] = useState(0);
     const [search, setSearch] = useState("");
 
-    // Refs for debounce, abort and last params to prevent duplicate identical fetches
     const debounceRef = useRef(null);
-    const lastParamsRef = useRef(null); // store last fetched params as JSON
+    const lastParamsRef = useRef(null);
     const abortControllerRef = useRef(null);
 
     // --- Tailwind Utility Components/Styles ---
@@ -30,7 +29,6 @@ const ProductManagementPage = () => {
     const AlertErrorStyle =
         "p-4 mb-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg";
 
-    // single fetch function (internal)
     const fetchProductsFromServer = async ({
         page,
         rowsPerPage,
@@ -53,9 +51,7 @@ const ProductManagementPage = () => {
             setTotalRows(res.data.total ?? 0);
             setCurrentPage(res.data.current_page ?? page);
         } catch (err) {
-            // aborted requests are normal when user types / switches pages quickly
             if (err.name === "CanceledError" || err.name === "AbortError") {
-                // ignore
                 return;
             }
             console.error("Error Fetching Products:-->", err);
@@ -68,13 +64,10 @@ const ProductManagementPage = () => {
         }
     };
 
-    // Effect: watch currentPage, perPage, search
     useEffect(() => {
-        // Prepare current params and compare with last fetched params to avoid duplicate calls
         const params = { page: currentPage, per_page: perPage, search };
 
         const paramsKey = JSON.stringify(params);
-        // If last fetch used the same params, skip (this prevents duplicate fetches from StrictMode double-mount)
         if (lastParamsRef.current === paramsKey) {
             return;
         }
@@ -87,7 +80,6 @@ const ProductManagementPage = () => {
             debounceRef.current = null;
         }
 
-        // Abort previous request if any
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
             abortControllerRef.current = null;
@@ -126,9 +118,8 @@ const ProductManagementPage = () => {
                 abortControllerRef.current = null;
             }
         };
-    }, [currentPage, perPage, search]); // effect driven only by these states
+    }, [currentPage, perPage, search]);
 
-    // Handlers update state only — effect does the fetching
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
@@ -138,7 +129,6 @@ const ProductManagementPage = () => {
         setCurrentPage(page);
     };
 
-    // on save success: accept optional updated product to patch locally (avoid re-fetch)
     const handleDataChange = (updatedProduct = null) => {
         if (updatedProduct) {
             setProducts((prev) =>
@@ -148,14 +138,11 @@ const ProductManagementPage = () => {
             );
             return;
         }
-        // fallback: force a re-fetch by clearing lastParamsRef so effect will run
         lastParamsRef.current = null;
-        // trigger effect by setting same page (this will not re-run unless we change a dep)
-        // simplest is to re-set currentPage to same value after microtick to trigger effect:
+
         setTimeout(() => setCurrentPage((p) => p), 0);
     };
 
-    // Modal/Form Handlers
     const handleOpenAdd = () => {
         setCurrentProduct(null);
         setIsModalOpen(true);
@@ -188,9 +175,9 @@ const ProductManagementPage = () => {
                 className={`${InputStyle} mb-6`}
                 value={search}
                 onChange={(e) => {
-                    setCurrentPage(1); // reset page on new search
+                    setCurrentPage(1);
                     setSearch(e.target.value);
-                    // also clear lastParamsRef so effect will run after debounce
+
                     lastParamsRef.current = null;
                 }}
             />

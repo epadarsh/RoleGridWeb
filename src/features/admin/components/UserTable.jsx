@@ -4,6 +4,7 @@ import DataTable from "react-data-table-component";
 
 import api from "../../../services/api";
 import { showToast } from "../../../redux/toastSlice";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const UserTable = ({
     users,
@@ -87,7 +88,6 @@ const UserTable = ({
         },
         {
             name: "Actions",
-            // Render the buttons inside `cell` and prevent row click from triggering
             cell: (row) => (
                 <div className="flex space-x-2">
                     <button
@@ -107,24 +107,23 @@ const UserTable = ({
                 </div>
             ),
             ignoreRowClick: true,
-            // removed `button: true` and `allowOverflow: true` to avoid React warnings
+
             width: "160px",
         },
     ];
 
-    // Custom Spinner for RDTC loading state (Tailwind only)
-    const CustomLoader = (
-        <div className="p-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-indigo-500 mx-auto"></div>
-        </div>
-    );
+    // const CustomLoader = (
+    //     <div className="p-4">
+    //         <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-indigo-500 mx-auto"></div>
+    //     </div>
+    // );
 
     return (
         <DataTable
             columns={columns}
             data={users}
             progressPending={loading}
-            progressComponent={CustomLoader}
+            progressComponent={LoadingSpinner}
             pagination
             paginationServer
             paginationTotalRows={totalRows}

@@ -61,7 +61,6 @@ api.interceptors.response.use(
             );
         }
 
-        // Return a rejected promise to stop the flow in the component that called the API
         return Promise.reject(error);
     }
 );
