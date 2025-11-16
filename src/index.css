@@ -1,17 +1,15 @@
    @import "tailwindcss";
 
-   /* 2. GLOBAL STYLES
-      Sets the default font stack and resets basic browser styles. */
    body {
-     /* Set 'Inter' as the primary font */
+
      font-family: 'Inter', sans-serif, system-ui, Avenir, Helvetica, Arial;
 
-     /* Resetting default styles */
+
      margin: 0;
      display: block;
      min-height: 100vh;
 
-     /* Font smoothing */
+
      -webkit-font-smoothing: antialiased;
      -moz-osx-font-smoothing: grayscale;
    }

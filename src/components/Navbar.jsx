@@ -53,7 +53,13 @@ const Navbar = () => {
 
                         {isAuthenticated ? (
                             <>
-                                {/* Conditional Admin Link */}
+                                <Link
+                                    to="/products/internal"
+                                    className={NavLinkStyle}
+                                >
+                                    Internal Store
+                                </Link>
+
                                 {user?.role === "admin" && (
                                     <Link to="/admin" className={NavLinkStyle}>
                                         Admin Panel

@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../../services/api";
 import { setCredentials } from "../authSlice";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const LoginPage = () => {
     const dispatch = useDispatch();
@@ -61,9 +62,6 @@ const LoginPage = () => {
         "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-150 shadow-md disabled:opacity-50";
     const AlertErrorStyle =
         "p-4 mb-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg";
-    const LoadingSpinner = () => (
-        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white inline-block mr-2"></div>
-    );
 
     // Placeholder image URL - replaced with a relevant placeholder
     const imageUrl =

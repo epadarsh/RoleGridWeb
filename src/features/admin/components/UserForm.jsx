@@ -1,53 +1,58 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+
 import api from "../../../services/api";
+import { showToast } from "../../../redux/toastSlice";
+import Modal from "../../../components/Modal";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 // --- Reusable Tailwind Modal Component (for consistency) ---
-const Modal = ({ open, handleClose, title, children, actions }) => {
-    if (!open) return null;
+// const Modal = ({ open, handleClose, title, children, actions }) => {
+//     if (!open) return null;
 
-    return (
-        <div className="fixed inset-0 z-[100] bg-gray-900 bg-opacity-75 flex justify-center items-center p-4 transition-opacity duration-300">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all sm:my-8 sm:align-middle">
-                {/* Header */}
-                <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                        {title}
-                    </h2>
-                    <button
-                        onClick={handleClose}
-                        className="text-gray-400 hover:text-gray-600 transition duration-150 p-1"
-                        aria-label="Close"
-                    >
-                        <svg
-                            className="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            ></path>
-                        </svg>
-                    </button>
-                </div>
+//     return (
+//         <div className="fixed inset-0 z-[100] bg-gray-900 bg-opacity-75 flex justify-center items-center p-4 transition-opacity duration-300">
+//             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all sm:my-8 sm:align-middle">
+//                 {/* Header */}
+//                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
+//                     <h2 className="text-xl font-semibold text-gray-800">
+//                         {title}
+//                     </h2>
+//                     <button
+//                         onClick={handleClose}
+//                         className="text-gray-400 hover:text-gray-600 transition duration-150 p-1"
+//                         aria-label="Close"
+//                     >
+//                         <svg
+//                             className="w-6 h-6"
+//                             fill="none"
+//                             stroke="currentColor"
+//                             viewBox="0 0 24 24"
+//                             xmlns="http://www.w3.org/2000/svg"
+//                         >
+//                             <path
+//                                 strokeLinecap="round"
+//                                 strokeLinejoin="round"
+//                                 strokeWidth="2"
+//                                 d="M6 18L18 6M6 6l12 12"
+//                             ></path>
+//                         </svg>
+//                     </button>
+//                 </div>
 
-                {/* Content */}
-                <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
-                    {children}
-                </div>
+//                 {/* Content */}
+//                 <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
+//                     {children}
+//                 </div>
 
-                {/* Actions */}
-                <div className="flex justify-end px-6 py-4 border-t border-gray-100 bg-gray-50 space-x-3">
-                    {actions}
-                </div>
-            </div>
-        </div>
-    );
-};
+//                 {/* Actions */}
+//                 <div className="flex justify-end px-6 py-4 border-t border-gray-100 bg-gray-50 space-x-3">
+//                     {actions}
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
 // ------------------------------------------
 
 const initialUserState = {
@@ -63,6 +68,7 @@ const UserForm = ({ open, handleClose, currentUser, onSaveSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const dispatch = useDispatch();
     const isEditMode = !!currentUser;
 
     // Syncs the form state when the currentUser prop changes
@@ -115,6 +121,14 @@ const UserForm = ({ open, handleClose, currentUser, onSaveSuccess }) => {
 
         try {
             await api[method](endpoint, payload);
+            dispatch(
+                showToast({
+                    message: isEditMode
+                        ? `User "${currentUser.name}" Updated successfully.`
+                        : `User Added successfully.`,
+                    severity: "success",
+                })
+            );
             onSaveSuccess(); // Trigger list refresh in parent
             handleClose();
         } catch (err) {
@@ -137,9 +151,9 @@ const UserForm = ({ open, handleClose, currentUser, onSaveSuccess }) => {
         "bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition duration-150 disabled:opacity-50";
     const AlertStyle =
         "p-3 mb-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg";
-    const LoadingSpinner = () => (
-        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white inline-block mr-2"></div>
-    );
+    // const LoadingSpinner = () => (
+    //     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white inline-block mr-2"></div>
+    // );
 
     return (
         <Modal
@@ -239,7 +253,7 @@ const UserForm = ({ open, handleClose, currentUser, onSaveSuccess }) => {
                             className={InputStyle}
                             value={formData.password}
                             onChange={handleChange}
-                            placeholder="Leave blank to keep existing"
+                            placeholder="Enter your strong password"
                         />
                     </div>
                     <div className="flex-1">
@@ -253,6 +267,7 @@ const UserForm = ({ open, handleClose, currentUser, onSaveSuccess }) => {
                             className={InputStyle}
                             value={formData.password_confirmation}
                             onChange={handleChange}
+                            placeholder="Re-enter your password"
                         />
                     </div>
                 </div>

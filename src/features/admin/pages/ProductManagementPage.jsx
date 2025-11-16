@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ProductTable from "../components/ProductTable";
 import ProductForm from "../components/ProductForm";
 import api from "../../../services/api";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const ProductManagementPage = () => {
     const [products, setProducts] = useState([]);
@@ -28,9 +29,6 @@ const ProductManagementPage = () => {
         "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 shadow-md";
     const AlertErrorStyle =
         "p-4 mb-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg";
-    const LoadingSpinner = () => (
-        <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-indigo-500 mx-auto block mt-10"></div>
-    );
 
     // single fetch function (internal)
     const fetchProductsFromServer = async ({

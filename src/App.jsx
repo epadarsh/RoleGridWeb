@@ -1,41 +1,45 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute.jsx";
 import Navbar from "./components/Navbar";
-// IMPORTANT: Ensure AuthInitializer.jsx is in src/components/
-import AuthInitializer from "./components/AuthInitializer.jsx";
+import AuthInitializer from "./components/AuthInitializer.jsx"; // Session persistence fix
+import ToastManager from "./components/ToastManager.jsx"; // Global error display
 
-// Auth Pages
+// Auth Pages (Ensure these files are named .jsx)
 import LoginPage from "./features/auth/pages/LoginPage.jsx";
 import RegisterPage from "./features/auth/pages/RegisterPage.jsx";
 
-// User Pages
+// User Pages (Ensure these files are named .jsx)
 import UserDashboard from "./features/user/pages/UserDashboard.jsx";
-
-// Admin Pages
+import InternalProductsPage from "./features/user/pages/InternalProductsPage.jsx";
+// Admin Pages (Ensure these files are named .jsx)
 import AdminDashboard from "./features/admin/pages/AdminDashboard.jsx";
 import UserManagementPage from "./features/admin/pages/UserManagementPage.jsx";
 import ProductManagementPage from "./features/admin/pages/ProductManagementPage.jsx";
 
-// Public Pages
+// Public Pages (Ensure these files are named .jsx)
 import PublicProductsPage from "./features/public/pages/PublicProductsPage.jsx";
-import PublicRoute from "./components/PublicRoute.jsx";
+import ProductsPage from "./components/ProductsPage.jsx";
 
 function App() {
     return (
         <BrowserRouter>
-            {/* CRITICAL FIX: AuthInitializer wraps the entire application.
-        It checks the token on every load and restores the user session
-        into Redux, fixing the "logged out on refresh" problem.
-      */}
+            {/* ToastManager is placed here so it's always rendered and listens to errors */}
+            <ToastManager />
+
+            {/* AuthInitializer wraps the entire application to restore the session on refresh */}
             <AuthInitializer>
                 <Navbar />
                 <main className="p-4 bg-gray-50 min-h-screen">
                     <Routes>
-                        {/* Public Routes (Accessible without login) */}
-                        <Route path="/" element={<PublicProductsPage />} />
+                        {/* Public Routes */}
+                        <Route
+                            path="/"
+                            element={<ProductsPage isExternal={true} />}
+                        />
 
-                        {/* PublicRoute wraps login + register */}
+                        {/* Restricted Auth Routes: Redirects logged-in users away from /login and /register */}
                         <Route element={<PublicRoute />}>
                             <Route path="/login" element={<LoginPage />} />
                             <Route
@@ -43,9 +47,6 @@ function App() {
                                 element={<RegisterPage />}
                             />
                         </Route>
-
-                        {/* <Route path="/login" element={<LoginPage />} />
-                        <Route path="/register" element={<RegisterPage />} /> */}
 
                         {/* Protected Routes: User and Admin Access */}
                         <Route
@@ -58,6 +59,10 @@ function App() {
                             <Route
                                 path="/dashboard"
                                 element={<UserDashboard />}
+                            />
+                            <Route
+                                path="/products/internal"
+                                element={<ProductsPage />}
                             />
                         </Route>
 

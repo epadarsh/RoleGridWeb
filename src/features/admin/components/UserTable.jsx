@@ -1,6 +1,9 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import DataTable from "react-data-table-component";
+
 import api from "../../../services/api";
+import { showToast } from "../../../redux/toastSlice";
 
 const UserTable = ({
     users,
@@ -11,12 +14,20 @@ const UserTable = ({
     handlePageChange,
     handlePerRowsChange,
 }) => {
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this user?"))
+    const dispatch = useDispatch();
+
+    const handleDelete = async (id, name) => {
+        if (!window.confirm(`Are you sure you want to delete user: "${name}"?`))
             return;
 
         try {
             await api.delete(`/admin/users/${id}`);
+            dispatch(
+                showToast({
+                    message: `User "${name}" deleted successfully.`,
+                    severity: "success",
+                })
+            );
             onDataChange(); // Notify parent to refresh list
         } catch (error) {
             console.error(
@@ -76,25 +87,27 @@ const UserTable = ({
         },
         {
             name: "Actions",
+            // Render the buttons inside `cell` and prevent row click from triggering
             cell: (row) => (
                 <div className="flex space-x-2">
                     <button
                         className="text-blue-600 hover:text-blue-800 font-medium px-3 py-1 border border-blue-600 rounded-md transition duration-150 text-xs"
                         onClick={() => onEdit(row)}
+                        aria-label={`Edit ${row.name}`}
                     >
                         Edit
                     </button>
                     <button
                         className="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-1 rounded-md transition duration-150 text-xs"
-                        onClick={() => handleDelete(row.id)}
+                        onClick={() => handleDelete(row.id, row.name)}
+                        aria-label={`Delete ${row.name}`}
                     >
                         Delete
                     </button>
                 </div>
             ),
             ignoreRowClick: true,
-            button: true,
-            allowOverflow: true,
+            // removed `button: true` and `allowOverflow: true` to avoid React warnings
             width: "160px",
         },
     ];
@@ -119,7 +132,7 @@ const UserTable = ({
             onChangePage={handlePageChange}
             highlightOnHover
             pointerOnHover
-            className="rounded-lg shadow-xl" // Apply Tailwind styles to the outer container
+            className="rounded-lg shadow-xl"
         />
     );
 };

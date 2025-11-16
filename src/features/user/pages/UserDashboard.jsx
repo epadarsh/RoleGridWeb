@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import api from "../../../services/api";
 import { setUser } from "../../auth/authSlice";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 // NOTE: Replace this with your actual front-end base URL
 const FRONTEND_BASE_URL = "http://localhost:5173";
@@ -21,11 +22,6 @@ const UserDashboard = () => {
         "p-4 mb-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg";
     const ButtonStyle =
         "bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition duration-150 shadow-md disabled:opacity-50";
-    const LoadingSpinner = () => (
-        <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-indigo-500"></div>
-        </div>
-    );
 
     // --- Data Fetching ---
 

@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import api from "../../../services/api";
 import { setCredentials } from "../authSlice";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const RegisterPage = () => {
     const [searchParams] = useSearchParams();
@@ -76,9 +77,6 @@ const RegisterPage = () => {
         "p-4 mb-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg";
     const AlertInfoStyle =
         "p-4 mb-4 text-sm text-blue-800 bg-blue-50 border border-blue-200 rounded-lg";
-    const LoadingSpinner = () => (
-        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white inline-block mr-2"></div>
-    );
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
