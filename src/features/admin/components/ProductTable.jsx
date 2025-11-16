@@ -48,7 +48,7 @@ const ProductTable = ({
         },
         {
             name: "Price",
-            selector: (row) => `$${row.price.toFixed(2)}`,
+            selector: (row) => `$${Number(row.price).toFixed(2)}`,
             sortable: true,
             width: "100px",
         },

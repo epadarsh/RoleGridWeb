@@ -19,6 +19,7 @@ import ProductManagementPage from "./features/admin/pages/ProductManagementPage.
 
 // Public Pages
 import PublicProductsPage from "./features/public/pages/PublicProductsPage.jsx";
+import PublicRoute from "./components/PublicRoute.jsx";
 
 function App() {
     return (
@@ -33,8 +34,18 @@ function App() {
                     <Routes>
                         {/* Public Routes (Accessible without login) */}
                         <Route path="/" element={<PublicProductsPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/register" element={<RegisterPage />} />
+
+                        {/* PublicRoute wraps login + register */}
+                        <Route element={<PublicRoute />}>
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route
+                                path="/register"
+                                element={<RegisterPage />}
+                            />
+                        </Route>
+
+                        {/* <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} /> */}
 
                         {/* Protected Routes: User and Admin Access */}
                         <Route

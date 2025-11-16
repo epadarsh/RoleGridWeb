@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ProductTable from "../components/ProductTable";
 import ProductForm from "../components/ProductForm";
 import api from "../../../services/api";
@@ -16,6 +16,11 @@ const ProductManagementPage = () => {
     const [totalRows, setTotalRows] = useState(0);
     const [search, setSearch] = useState("");
 
+    // Refs for debounce, abort and last params to prevent duplicate identical fetches
+    const debounceRef = useRef(null);
+    const lastParamsRef = useRef(null); // store last fetched params as JSON
+    const abortControllerRef = useRef(null);
+
     // --- Tailwind Utility Components/Styles ---
     const InputStyle =
         "w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 shadow-sm";
@@ -27,66 +32,132 @@ const ProductManagementPage = () => {
         <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-indigo-500 mx-auto block mt-10"></div>
     );
 
-    // 1. Fetching Function (Handles all server-side parameters)
-    const fetchProducts = useCallback(
-        async (page, rowsPerPage, searchQuery) => {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await api.get(`/admin/products`, {
-                    params: {
-                        page: page,
-                        per_page: rowsPerPage,
-                        search: searchQuery,
-                        // Add sort_by & sort_dir here if implementing column sorting
-                    },
-                });
+    // single fetch function (internal)
+    const fetchProductsFromServer = async ({
+        page,
+        rowsPerPage,
+        searchQuery,
+        signal,
+    }) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await api.get(`/admin/products`, {
+                params: {
+                    page,
+                    per_page: rowsPerPage,
+                    search: searchQuery,
+                },
+                signal,
+            });
 
-                setProducts(response.data.data);
-                setTotalRows(response.data.total);
-                setCurrentPage(response.data.current_page);
-            } catch (err) {
-                console.log("Error Fetching Products:-->", err);
-
-                setError(
-                    "Failed to fetch products. Check API status and authorization."
-                );
-                setProducts([]); // Clear data on error
-            } finally {
-                setLoading(false);
+            setProducts(res.data.data ?? []);
+            setTotalRows(res.data.total ?? 0);
+            setCurrentPage(res.data.current_page ?? page);
+        } catch (err) {
+            // aborted requests are normal when user types / switches pages quickly
+            if (err.name === "CanceledError" || err.name === "AbortError") {
+                // ignore
+                return;
             }
-        },
-        []
-    );
+            console.error("Error Fetching Products:-->", err);
+            setError(
+                "Failed to fetch products. Check API status and authorization."
+            );
+            setProducts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    // 2. Initial Data Fetch / Search Trigger
+    // Effect: watch currentPage, perPage, search
     useEffect(() => {
-        // Debounce search input
-        const handler = setTimeout(() => {
-            fetchProducts(1, perPage, search); // Reset to page 1 on new search
-        }, 500);
+        // Prepare current params and compare with last fetched params to avoid duplicate calls
+        const params = { page: currentPage, per_page: perPage, search };
 
-        return () => clearTimeout(handler);
-    }, [search, perPage, fetchProducts]);
+        const paramsKey = JSON.stringify(params);
+        // If last fetch used the same params, skip (this prevents duplicate fetches from StrictMode double-mount)
+        if (lastParamsRef.current === paramsKey) {
+            return;
+        }
 
-    // 3. Handlers for RDTC
+        // debounce for search typing
+        const delay = search ? 500 : 0;
+
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+            debounceRef.current = null;
+        }
+
+        // Abort previous request if any
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
+
+        const doFetch = () => {
+            // create a new abort controller for this request
+            const controller = new AbortController();
+            abortControllerRef.current = controller;
+
+            fetchProductsFromServer({
+                page: currentPage,
+                rowsPerPage: perPage,
+                searchQuery: search,
+                signal: controller.signal,
+            }).then(() => {
+                // set last params only after a successful attempt (so repeated identical attempts are blocked)
+                lastParamsRef.current = paramsKey;
+            });
+        };
+
+        if (delay > 0) {
+            debounceRef.current = setTimeout(doFetch, delay);
+        } else {
+            doFetch();
+        }
+
+        return () => {
+            // cleanup debounce timer and abort ongoing request when deps change or component unmounts
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+                debounceRef.current = null;
+            }
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+                abortControllerRef.current = null;
+            }
+        };
+    }, [currentPage, perPage, search]); // effect driven only by these states
+
+    // Handlers update state only — effect does the fetching
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        fetchProducts(page, perPage, search); // Fetch new page data
     };
 
     const handlePerRowsChange = (newPerPage, page) => {
         setPerPage(newPerPage);
         setCurrentPage(page);
-        fetchProducts(page, newPerPage, search); // Fetch with new perPage setting
     };
 
-    const handleDataChange = () => {
-        // Refresh the current page's data after Add/Edit/Delete
-        fetchProducts(currentPage, perPage, search);
+    // on save success: accept optional updated product to patch locally (avoid re-fetch)
+    const handleDataChange = (updatedProduct = null) => {
+        if (updatedProduct) {
+            setProducts((prev) =>
+                prev.map((p) =>
+                    p.id === updatedProduct.id ? updatedProduct : p
+                )
+            );
+            return;
+        }
+        // fallback: force a re-fetch by clearing lastParamsRef so effect will run
+        lastParamsRef.current = null;
+        // trigger effect by setting same page (this will not re-run unless we change a dep)
+        // simplest is to re-set currentPage to same value after microtick to trigger effect:
+        setTimeout(() => setCurrentPage((p) => p), 0);
     };
 
-    // 4. Modal/Form Handlers
+    // Modal/Form Handlers
     const handleOpenAdd = () => {
         setCurrentProduct(null);
         setIsModalOpen(true);
@@ -118,7 +189,12 @@ const ProductManagementPage = () => {
                 type="text"
                 className={`${InputStyle} mb-6`}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                    setCurrentPage(1); // reset page on new search
+                    setSearch(e.target.value);
+                    // also clear lastParamsRef so effect will run after debounce
+                    lastParamsRef.current = null;
+                }}
             />
 
             {error && <div className={AlertErrorStyle}>{error}</div>}

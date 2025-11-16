@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const FAKE_STORE_API = "https://fakestoreapi.com/products";
 
@@ -8,6 +9,8 @@ const PublicProductsPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const { isAuthenticated } = useSelector((state) => state.auth);
 
     // --- Tailwind Utility Components/Styles ---
     const CardStyle =
@@ -50,12 +53,14 @@ const PublicProductsPage = () => {
                     <h1 className="text-3xl font-bold text-gray-800">
                         🛍️ Public Product Catalog
                     </h1>
-                    <Link
-                        to="/login"
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 shadow-md"
-                    >
-                        Login / Register
-                    </Link>
+                    {!isAuthenticated && (
+                        <Link
+                            to="/login"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 shadow-md"
+                        >
+                            Login / Register
+                        </Link>
+                    )}
                 </div>
 
                 {error && <div className={AlertErrorStyle}>{error}</div>}
